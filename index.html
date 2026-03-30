@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday Sonaa 🎉</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Fredoka One', cursive; }
+    body, html { width: 100%; height: 100%; overflow: hidden; }
+    .page {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      text-align: center;
+      background: linear-gradient(to bottom right, #ffc6ff, #a0c4ff);
+      color: #333;
+      padding: 2rem;
+      position: relative;
+    }
+    .active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    h1, p { margin-bottom: 1rem; }
+    button {
+      background: linear-gradient(to right, #fbb1bd, #a2cfff);
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    button:hover { transform: scale(1.1); }
+    .heart {
+      position: absolute;
+      top: -50px;
+      font-size: 2.5rem;
+      color: #ff4081;
+      cursor: pointer;
+      animation: fall linear forwards;
+      z-index: 5;
+    }
+    @keyframes fall {
+      to { top: calc(100vh - 80px); }
+    }
+    .messageBox {
+      position: absolute;
+      background: rgba(255,255,255,0.95);
+      border: 2px solid #ff4081;
+      border-radius: 15px;
+      padding: 1.5rem;
+      font-size: 1.1rem;
+      width: 85%;
+      max-width: 400px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: #333;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+      z-index: 1000;
+      animation: popupAnim 0.3s ease-out;
+    }
+    @keyframes popupAnim {
+      from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div id="page1" class="page active">
+    <h1 style="font-size: 2rem; color:#ff4081;">Heyyy Sonaa 🎂🎉 Happy Birthday!! 🥳</h1>
+    <p style="font-size:1.2rem;">There’s a sweet surprise waiting for you below 👀💝</p>
+    <button onclick="nextPage(2)">Next ➡️</button>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div id="page2" class="page">
+    <h1>Straight from my Heart 💌</h1>
+    <p style="max-width: 90%; margin:auto;">Heyy sonna Its your birthday today a very happy birthday to you darling❤️ thankyou for being in my life. you are the best part of  my life that has ever happened to me. I know sometimes I hurt you and made mistakes knowingly or unknowingly but you never turn back on me, in my thick & thin you were always there for me…. you are prettiest, kind and sweet little baby girl for me. Your presence matter the most, you complete me sonaa🌷 this is a cute little msg for my cutiee I love youu 🫂❤️</p>
+    <button onclick="nextPage(3)">Next ➡️</button>
+  </div>
+
+  <!-- PAGE 3 -->
+  <div id="page3" class="page">
+    <h1 style="margin-bottom:1rem;">Catch the Falling Hearts ❤️</h1>
+    <p>Click the hearts to reveal a message!</p>
+    <button id="startHearts" onclick="startHearts()">Start 💕</button>
+  </div>
+
+  <!-- PAGE 4 -->
+  <div id="page4" class="page">
+    <h1>For You 🎶❤️</h1>
+    <audio id="bdayMusic" controls>
+      <source src="Mahiya.mpeg" type="audio/mp3">
+      Your browser does not support the audio element.
+    </audio>
+    <br>
+    <button onclick="nextPage(5)">Next ➡️</button>
+  </div>
+
+  <!-- PAGE 5 -->
+  <div id="page5" class="page">
+    <h1>Hope you liked this surprise majhi Puranpoli 💗</h1>
+    <p>Enjoy your day ahead — lots of love from your Babyy😚❤️</p>
+    <canvas id="confetti"></canvas>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    function nextPage(n) {
+      document.querySelector(`#page${currentPage}`).classList.remove('active');
+      document.querySelector(`#page${n}`).classList.add('active');
+      currentPage = n;
+      if (n === 5) launchConfetti();
+    }
+
+    // PAGE 3 hearts logic
+    const messages = [
+      "Nice catch... Catch more to reveal",
+      "मे रात दिन ये दुआ करूँ तेरे लिए मे जियूं मरुँ 😌",
+      "चारों पहर तुझे देखा करूँ मेरा जहाँ ये तुझपे फ़ना करूँ 😁",
+      "ज़िक्र तुम्हारा जब जब होता है देखो ना होंठों पे तेरा एहसास रेह जाता है  🫂",
+      "Meri Darling, Shawtyy, Babes, Puranpoli, Chhole Bhature Love Youuuuu 😚🌷",
+      "Kyu hila daala na Shawtyyy 😉",
+      "Lots of love ❣️"
+    ];
+
+    let heartIndex = 0;
+    let running = false;
+
+    function startHearts() {
+      document.getElementById('startHearts').style.display = 'none';
+      running = true;
+      spawnHeart();
+    }
+
+    function spawnHeart() {
+      if (heartIndex >= messages.length) {
+        showCompletion();
+        return;
+      }
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.innerHTML = '❤️';
+      heart.style.left = (Math.random() * 70 + 15) + '%';
+      heart.style.animationDuration = '7s';
+      document.getElementById('page3').appendChild(heart);
+
+      let isProcessed = false;
+      const triggerNext = () => {
+        if (isProcessed) return;
+        isProcessed = true;
+        heart.remove();
+        heartIndex++;
+        spawnHeart();
+      };
+
+      heart.addEventListener('click', function() {
+        if (isProcessed) return;
+        heart.style.animationPlayState = 'paused';
+        showMessage(messages[heartIndex], triggerNext);
+      });
+    }
+
+    function showMessage(msg, onNext) {
+      const box = document.createElement('div');
+      box.classList.add('messageBox');
+      box.innerHTML = msg + "<br><small>(Click anywhere to continue 💫)</small>";
+      document.getElementById('page3').appendChild(box);
+
+      function continueGame() {
+        if (box.parentNode) box.parentNode.removeChild(box);
+        document.body.removeEventListener('click', continueGame);
+        onNext();
+      }
+      // Delay adding the listener so the current click doesn't close the popup immediately
+      setTimeout(() => {
+        document.body.addEventListener('click', continueGame);
+      }, 100);
+    }
+
+    function showCompletion() {
+      const page3 = document.getElementById('page3');
+      page3.innerHTML = `
+        <div style="margin-top: 2rem;">
+          <h2 style="margin-bottom:1rem;">You caught all 7 hearts! 💞</h2>
+          <button onclick='restartHearts()'>Restart 💫</button> 
+          <button onclick='nextPage(4)'>Next ➡️</button>
+        </div>`;
+    }
+
+    function restartHearts() {
+      heartIndex = 0;
+      document.getElementById('page3').innerHTML = `
+        <h1 style="margin-bottom:1rem;">Catch the Falling Hearts ❤️</h1>
+        <p>Click the hearts to reveal a message!</p>
+        <button id="startHearts" onclick="startHearts()">Start 💕</button>`;
+    }
+
+    // PAGE 5 confetti
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      const pieces = [];
+      const colors = ['#ff9ff3', '#feca57', '#ff6b6b', '#48dbfb', '#1dd1a1'];
+      let W = canvas.width = window.innerWidth;
+      let H = canvas.height = window.innerHeight;
+
+      for (let i = 0; i < 100; i++) {
+        pieces.push({x: Math.random() * W, y: Math.random() * H - H, w: 10, h: 10, color: colors[Math.floor(Math.random() * colors.length)], speed: Math.random() * 3 + 2});
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        pieces.forEach(p => {
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.w, p.h);
+        });
+      }
+
+      function update() {
+        pieces.forEach(p => {
+          p.y += p.speed;
+          if (p.y > H) p.y = -10;
+        });
+      }
+
+      function loop() {
+        draw(); update();
+        requestAnimationFrame(loop);
+      }
+      loop();
+    }
+  </script>
+</body>
+</html>
